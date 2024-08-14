@@ -1,10 +1,11 @@
 import streamlit as st
-import google.generativeai as genai 
+import google.generativeai as genai
+
 # Adding title
 st.title('Chatbot')
 
 # Set up your Gemini AI API key
-genai.configure(api_key = st.secrets["Api_key"])
+client = genai.configure(api_key=st.secrets["Api_key"])
 
 # Define generation configuration
 generation_config = {
@@ -21,15 +22,32 @@ model = genai.GenerativeModel(
     # See https://ai.google.dev/gemini-api/docs/safety-settings
 )
 
-# Start a chat session
-chat_session = model.start_chat(
-    history=[]
-)
+# Initialize chat history
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-st.write('Welcome to the chatbot! Please do ask your question and I will try to answer it.')
+# Display chat messages from history on app rerun
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
 
-question = st.text_input('Ask a question:', key='unique_key')
+# Accept user input
+if prompt := st.chat_input("What is up?"):
+    # Start a chat session if not already started
+    if "chat_session" not in st.session_state:
+        st.session_state.chat_session = model.start_chat(history=[])
 
-if question:
-    response = chat_session.send_message(question)
-    st.write(response.text)
+    chat_session = st.session_state.chat_session
+
+    # Send message to the chat session
+    response = chat_session.send_message(prompt)
+    
+    # Update chat history
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    st.session_state.messages.append({"role": "assistant", "content": response.text})
+    
+    # Display the new messages
+    with st.chat_message("user"):
+        st.markdown(prompt)
+    with st.chat_message("assistant"):
+        st.markdown(response.text)
