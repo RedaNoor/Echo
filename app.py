@@ -1,13 +1,10 @@
 import streamlit as st
-import google.generativeai as genai  # Assuming gemini_ai is the library for Gemini AI
-
+import google.generativeai as genai 
 # Adding title
 st.title('Chatbot')
 
 # Set up your Gemini AI API key
 genai.configure(api_key = st.secrets["Api_key"])
-
-#genai.configure(api_key='AIzaSyBw902ueMsy1kqZiZHPWQ4Ir85JmF4z9KY')
 
 # Define generation configuration
 generation_config = {
