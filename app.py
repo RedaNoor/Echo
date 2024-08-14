@@ -5,7 +5,12 @@ import google.generativeai as genai  # Assuming gemini_ai is the library for Gem
 st.title('Chatbot')
 
 # Set up your Gemini AI API key
-genai.configure(api_key='AIzaSyBw902ueMsy1kqZiZHPWQ4Ir85JmF4z9KY')
+headers = {
+    'Authorization": st.secrets["api_key"]',
+    'Content-Type': 'application/json',
+}
+
+#genai.configure(api_key='AIzaSyBw902ueMsy1kqZiZHPWQ4Ir85JmF4z9KY')
 
 # Define generation configuration
 generation_config = {
