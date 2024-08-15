@@ -2,7 +2,7 @@ import streamlit as st
 import google.generativeai as genai
 
 # Adding title
-st.title("Chatbot using Gemini API")
+st.title("Gemini Clone")
 
 # Set up your Gemini AI API key
 client = genai.configure(api_key=st.secrets["Api_key"])
