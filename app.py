@@ -57,7 +57,7 @@ def update_chat(n_clicks, prompt, chat_history):
 
     # Update chat history
     chat_history.append(html.Div([
-        html.Div(f"User: {prompt}", style={'font-weight': 'bold'}),
+        html.Div(f"User: {prompt}", style={'font-weight': 'italic'}),
         html.Div(f"Assistant: {response_text}")
     ]))
 
