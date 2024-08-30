@@ -4,7 +4,7 @@ import dash_bootstrap_components as dbc
 import google.generativeai as genai
 
 # Set up your Gemini AI API key
-client = genai.configure(api_key="AIzaSyBw902ueMsy1kqZiZHPWQ4Ir85JmF4z9KY")
+client = genai.configure(api_key=st.secrets["Api_key"])
 
 # Define generation configuration
 generation_config = {
