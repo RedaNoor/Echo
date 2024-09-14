@@ -1,9 +1,23 @@
-import dash
-from dash import dcc, html, Input, Output, State
-import dash_bootstrap_components as dbc
+import streamlit as st
 import google.generativeai as genai
+from PIL import Image
 
-# Set up your Gemini AI API key
+# Adding title and logo
+# Create two columns
+col1, col2 = st.columns([1, 8])
+# Display the logo in the first column
+with col1:
+    st.image('static/images/logo.png', width=50, use_column_width='auto')
+st.markdown('<style>img { border-radius: 50%; }</style>', unsafe_allow_html=True)
+
+# Display the title in the second column
+with col2:
+    st.title('Echo')
+
+st.write('I am a chatbot Created by **RIDA NOOR** to help you with your queries.')
+st.write('Ask me anything!')
+
+# Set up your Gemini AI APuI key
 client = genai.configure(api_key=st.secrets["Api_key"])
 
 # Define generation configuration
@@ -21,47 +35,43 @@ model = genai.GenerativeModel(
     # See https://ai.google.dev/gemini-api/docs/safety-settings
 )
 
-# Initialize the Dash app
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+# Initialize chat history
+if "messages" not in st.session_state:
+    st.session_state.messages = [
+        {"role": "user", "content": "what is your name?, whats your name?, what are you called?, what do they call you?, what is your name, What is your name?, Whats your name" },
+        {"role": "assistant", "content": "I am named as ECHO."}
+    ]
 
-app.layout = html.Div([
-    html.H1('Echo'),
-    dcc.Input(id='user-input', type='text', placeholder='What is up?', style={'width': '100%'}),
-    html.Button('Send', id='send-button', n_clicks=0),
-    html.Div(id='chat-history', children=[])
-])
+# Load custom icons
+user_icon = Image.open("static/images/user3.png")
+bot_icon = Image.open("static/images/logo.png")
 
-@app.callback(
-    Output('chat-history', 'children'),
-    Input('send-button', 'n_clicks'),
-    State('user-input', 'value'),
-    State('chat-history', 'children')
-)
-def update_chat(n_clicks, prompt, chat_history):
-    if not prompt:
-        return chat_history
-
-    # Check if the user is asking for the chatbot's name
-    if prompt.lower() in ["what is your name?", "who are you?", "what's your name?", "what is your name", "who are you", "what's your name", "do you have a name"]:
-        response_text = "Hi, my name is Echo AI. How may I assist you today?"
+# Display chat messages from history on app rerun
+for message in st.session_state.messages:
+    if message["role"] == "user":
+        with st.chat_message(message["role"], avatar=user_icon):
+            st.markdown(message["content"])
     else:
-        # Start a chat session if not already started
-        if 'chat_session' not in app.server.config:
-            app.server.config['chat_session'] = model.start_chat(history=[])
+        with st.chat_message(message["role"], avatar=bot_icon):
+            st.markdown(message["content"])
 
-        chat_session = app.server.config['chat_session']
+# Accept user input
+if prompt := st.chat_input("What is up?"):
+    # Start a chat session if not already started
+    if "chat_session" not in st.session_state:
+        st.session_state.chat_session = model.start_chat(history=[])
 
-        # Send message to the chat session
-        response = chat_session.send_message(prompt)
-        response_text = response.text
+    chat_session = st.session_state.chat_session
 
+    # Send message to the chat session
+    response = chat_session.send_message(prompt)
+    
     # Update chat history
-    chat_history.append(html.Div([
-        html.Div(f"User: {prompt}", style={'font-weight': 'italic'}),
-        html.Div(f"Assistant: {response_text}")
-    ]))
-
-    return chat_history
-
-if __name__ == '__main__':
-    app.run_server(debug=True)
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    st.session_state.messages.append({"role": "assistant", "content": response.text})
+    
+    # Display the new messages
+    with st.chat_message("user", avatar=user_icon):
+        st.markdown(prompt)
+    with st.chat_message("assistant", avatar=bot_icon):
+        st.markdown(response.text)
