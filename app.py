@@ -14,8 +14,7 @@ st.markdown('<style>img { border-radius: 50%; }</style>', unsafe_allow_html=True
 with col2:
     st.title('Echo')
 
-st.write('I am a chatbot Created by **RIDA NOOR** to help you with your queries.')
-st.write('Ask me anything!')
+st.write('A chatbot Created by **RIDA NOOR** to help you with your queries.')
 
 # Set up your Gemini AI APuI key
 client = genai.configure(api_key=st.secrets["Api_key"])
@@ -37,10 +36,7 @@ model = genai.GenerativeModel(
 
 # Initialize chat history
 if "messages" not in st.session_state:
-    st.session_state.messages = [
-        {"role": "user", "content": "what is your name?, whats your name?, what are you called?, what do they call you?, what is your name, What is your name?, Whats your name" },
-        {"role": "assistant", "content": "I am named as ECHO."}
-    ]
+    st.session_state.messages = []
 
 # Load custom icons
 user_icon = Image.open("static/images/user3.png")
